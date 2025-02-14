@@ -27,8 +27,7 @@
 import csv
 import os
 from DataStructures.List import array_list as lt
-# TODO Importar la librería para el manejo de listas
-
+from DataStructures.List import single_linked_list as slt
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 
 """
@@ -51,9 +50,9 @@ def new_logic():
     }
 
     catalog['books'] = lt.new_list()
-    # TODO Implemente la inicialización de la lista de autores
-    # TODO Implemente la inicialización de la lista de tags
-    # TODO Implemente la inicialización de la lista de asociación de libros y tags
+    catalog["authors"] = lt.new_list()
+    catalog["tags"] = lt.new_list()
+    catalog['book_tags'] = lt.new_list
     return catalog
 
 
@@ -66,11 +65,9 @@ def load_data(catalog):
     estructura de datos
     """
     books, authors = load_books(catalog)
-    # TODO Complete la carga de los tags
-    # TODO Complete la carga de los book_tags
-    # TODO Añada
-    return books, authors
-    # pass
+    tags= load_tags(catalog)
+    book_tags= load_books_tags(catalog)
+    return books, authors, tags, book_tags
 
 
 def load_books(catalog):
@@ -94,8 +91,11 @@ def load_tags(catalog):
 
     :return: El número de tags cargados
     """
-    # TODO Implementar la carga de los tags
-    pass
+    tagsfile = data_dir + 'GoodReads/tags-medium.csv'
+    input_file = csv.DictReader(open(tagsfile, encoding='utf-8'))
+    for tag in input_file:
+        add_tag(catalog, tag)
+    return tag_size(catalog)
 
 
 def load_books_tags(catalog):
@@ -106,8 +106,11 @@ def load_books_tags(catalog):
 
     :return: El número de book_tags cargados
     """
-    # TODO Implementar la carga de los book_tags
-    pass
+    booktagsfile = data_dir + 'GoodReads/booktags-medium.csv'
+    input_file = csv.DictReader(open(booktagsfile, encoding='utf-8'))
+    for book_tag in input_file:
+        add_book_tag(catalog, book_tag)
+    return book_tag_size(catalog)
 
 
 # Funciones de consulta sobre el catálogo
@@ -124,7 +127,7 @@ def get_books_by_author(catalog, author_name):
     return None
 
 
-def get_best_book(catalog):
+def get_best_book(catalog, number):
     """
     Busca el libro con el mejor rating. Retorna el último libro que se encontró
 
@@ -132,8 +135,13 @@ def get_best_book(catalog):
 
     :return: El libro con el mejor rating
     """
-    # TODO Implementar la función del mejor libro por rating
-    return None
+    best_books= catalog["books"]
+    size= lt.size(best_books)
+    for i in range(size):
+        for j in range(1, size -1):
+            if compare_ratings(lt.get_element(best_books, j+1), lt.get_element(best_books, j)) > 0:
+                lt.exchange(best_books,j,j+1)
+    return lt.sub_list(best_books, 1, number)
 
 
 def count_books_by_tag(catalog, tag):
@@ -145,8 +153,15 @@ def count_books_by_tag(catalog, tag):
 
     :return: El número de libros que fueron etiquetados con el tag dado
     """
-    # TODO Implementar la función de conteo de libros por tag
-    pass
+    tag_posicion= lt.is_present(catalog["tags"], tag, compare_tag_names)
+    if tag_posicion == -1:
+        return 0
+    tag_elemento= lt.get_element(catalog["tags"], tag_posicion +1)
+    books_tags= lt.new_list()
+    for book_tag in catalog["book_tags"]["elements"]:
+        if book_tag["tag_id"] == tag_elemento["tag_id"]:
+            lt.add_last(books_tags, book_tag["book_id"])
+    return lt.size(books_tags)
 
 
 # Funciones para agregar informacion al catalogo
@@ -241,8 +256,7 @@ def author_size(catalog):
 
     :return: El número de autores en el catálogo
     """
-    # TODO Implementar la función de tamaño de autores
-    pass
+    return lt.size(catalog["authors"])
 
 
 def tag_size(catalog):
@@ -253,8 +267,7 @@ def tag_size(catalog):
 
     :return: El número de tags en el catálogo
     """
-    # TODO Implementar la función de tamaño de tags
-    pass
+    return
 
 
 def book_tag_size(catalog):
