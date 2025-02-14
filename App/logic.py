@@ -267,7 +267,7 @@ def tag_size(catalog):
 
     :return: El número de tags en el catálogo
     """
-    return
+    return lt.size(catalog["tags"])
 
 
 def book_tag_size(catalog):
@@ -278,8 +278,7 @@ def book_tag_size(catalog):
 
     :return: El número de book_tags en el catálogo
     """
-    # TODO Implementar la función de tamaño de book_tags
-    pass
+    return lt.size(catalog["book_tags"])
 
 
 # Funciones utilizadas para comparar elementos dentro de una lista
